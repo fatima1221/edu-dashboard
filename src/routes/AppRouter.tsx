@@ -2,24 +2,32 @@ import * as React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../app/store";
+import LoginForm from "../features/auth/components/LoginForm";
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const isAuth = useSelector((state: RootState) => state.auth.isAuthenticated);
+  return isAuth ? <>{children}</> : <Navigate to="/login" replace />;
+}
 
 export const AppRouter: React.FC = () => {
-  const isAuth = useSelector((state: RootState) => state.auth.isAuthenticated);
-
   return (
     <BrowserRouter>
       <Routes>
-        {isAuth ? (
-          <>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            {/* Add more routes here */}
-            <Route path="/dashboard" element={<div>Dashboard Page</div>} />
-          </>
-        ) : (
-          <>
-            <Route path="/login" element={<div>Login Page</div>} />
-          </>
-        )}
+        <Route path="/login" element={<LoginForm />} />{" "}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              {" "}
+              <div>Main Page</div>
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to="universities" replace />} />
+          <Route path="universities" element={<div>Universities Page</div>} />
+          <Route path="schools" element={<div>Schools Page</div>} />
+          <Route path="highschools" element={<div>High Schools Page</div>} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
