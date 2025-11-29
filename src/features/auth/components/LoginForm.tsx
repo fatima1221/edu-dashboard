@@ -11,6 +11,8 @@ import Button from "@mui/material/Button";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const LoginForm = () => {
+  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -19,16 +21,38 @@ const LoginForm = () => {
 
   const isEmailValid = useMemo(() => EMAIL_REGEX.test(email), [email]);
   const isPasswordValid = useMemo(() => password.length >= 6, [password]);
-
   const isValid = isEmailValid && isPasswordValid;
-  function handleSubmit(e: React.FormEvent) {
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
-    if (isValid) {
-      dispatch(loginSuccess({ token: "dummy-token", email }));
+    setServerError(null);
+
+    if (!isValid) return;
+    setLoading(true);
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Login failed");
+      }
+
+      const data = await response.json();
+
+      dispatch(loginSuccess(data));
       navigate("/");
+    } catch (error: any) {
+      setServerError(error.message || "An unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
   }
+
   return (
     <Box
       sx={{
@@ -49,6 +73,11 @@ const LoginForm = () => {
         <Typography variant="h5" component="h1" align="center" gutterBottom>
           Sign in to Edu Dashboard
         </Typography>
+        {serverError && (
+          <Typography color="error" sx={{ mb: 1 }}>
+            {serverError}
+          </Typography>
+        )}
         <TextField
           label="Email"
           type="email"
@@ -75,8 +104,14 @@ const LoginForm = () => {
           }
           autoComplete="current-password"
         />
-        <Button type="submit" disabled={!isValid} variant="contained" fullWidth>
-          Sign In
+        <Button
+          type="submit"
+          disabled={!isValid || loading}
+          variant="contained"
+          fullWidth
+          sx={{ mt: 2 }}
+        >
+          {loading ? "Signing in..." : "Sign In"}
         </Button>
       </Paper>
     </Box>
