@@ -11,6 +11,4 @@ export interface HighSchoolFilters {
   district?: string;
   specialization?: "science" | "math" | "literature" | "mixed";
   hasDormitory?: boolean;
-  minRanking?: number;
-  maxRanking?: number;
 }
