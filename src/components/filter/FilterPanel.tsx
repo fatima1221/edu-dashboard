@@ -3,9 +3,10 @@ import {
   TextField,
   MenuItem,
   Button,
-  Stack,
-  Box,
+  Grid,
   Typography,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import type { FilterField } from "./types";
 
@@ -32,7 +33,7 @@ export function FilterPanel<T extends object>({
         </Typography>
       )}
 
-      <Stack direction="row" spacing={2} flexWrap="wrap">
+      <Grid container spacing={2}>
         {fields.map((f) => {
           const value = (filters as any)[f.name] ?? "";
 
@@ -45,7 +46,34 @@ export function FilterPanel<T extends object>({
                   label={f.label}
                   type={f.type}
                   value={value}
-                  onChange={(e) => onChange(f.name as keyof T, e.target.value)}
+                  onChange={(e) =>
+                    onChange(
+                      f.name as keyof T,
+                      f.type === "number"
+                        ? e.target.value === ""
+                          ? undefined
+                          : Number(e.target.value)
+                        : e.target.value
+                    )
+                  }
+                  sx={{ minWidth: 200 }}
+                />
+              );
+
+            case "date":
+              return (
+                <TextField
+                  key={f.name}
+                  label={f.label}
+                  type="date"
+                  InputLabelProps={{ shrink: true }}
+                  value={value || ""}
+                  onChange={(e) =>
+                    onChange(
+                      f.name as keyof T,
+                      e.target.value === "" ? undefined : e.target.value
+                    )
+                  }
                   sx={{ minWidth: 200 }}
                 />
               );
@@ -71,23 +99,25 @@ export function FilterPanel<T extends object>({
 
             case "checkbox":
               return (
-                <Box
+                <FormControlLabel
                   key={f.name}
-                  sx={{ display: "flex", alignItems: "center", pl: 1 }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={value || false}
-                    onChange={(e) =>
-                      onChange(f.name as keyof T, e.target.checked)
-                    }
-                  />
-                  <Typography sx={{ ml: 1 }}>{f.label}</Typography>
-                </Box>
+                  control={
+                    <Checkbox
+                      checked={!!value}
+                      onChange={(e) =>
+                        onChange(f.name as keyof T, e.target.checked)
+                      }
+                    />
+                  }
+                  label={f.label}
+                />
               );
+
+            default:
+              return null;
           }
         })}
-      </Stack>
+      </Grid>
 
       {onClear && (
         <Button sx={{ mt: 2 }} variant="outlined" onClick={onClear}>

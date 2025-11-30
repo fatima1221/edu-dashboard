@@ -27,8 +27,6 @@ const fields: FilterField[] = [
     ],
   },
   { type: "checkbox", name: "hasDormitory", label: "Dormitory" },
-  { type: "number", name: "minRanking", label: "Min Ranking" },
-  { type: "number", name: "maxRanking", label: "Max Ranking" },
 ];
 
 const columns: Column<HighSchool>[] = [
@@ -50,9 +48,7 @@ export default function HighSchoolsPage() {
       city: "",
       district: "",
       specialization: undefined,
-      hasDormitory: false,
-      minRanking: undefined,
-      maxRanking: undefined,
+      hasDormitory: undefined,
     }
   );
 
