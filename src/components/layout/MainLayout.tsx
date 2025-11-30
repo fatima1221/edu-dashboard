@@ -1,5 +1,5 @@
 import Sidebar from "./Sidebar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
@@ -8,8 +8,8 @@ import { useState } from "react";
 
 export default function MainLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
+  const { pathname } = useLocation();
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f5f5f5" }}>
@@ -33,16 +33,18 @@ export default function MainLayout() {
           </IconButton>
         )}
 
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" fontWeight={600} gutterBottom>
-            Welcome to Edu Dashboard
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Select an institution type from the left menu to manage
-            Universities, Schools, or High Schools. Use filters on each page to
-            search, sort, and narrow down results.
-          </Typography>
-        </Box>
+        {pathname === "/" && (
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h4" fontWeight={600} gutterBottom>
+              Welcome to Edu Dashboard
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Select an institution type from the left menu to manage
+              Universities, Schools, or High Schools. Use filters on each page
+              to search, sort, and narrow down results.
+            </Typography>
+          </Box>
+        )}
 
         <Outlet />
       </Box>

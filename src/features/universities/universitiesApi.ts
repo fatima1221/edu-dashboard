@@ -1,12 +1,27 @@
-import { createInstitutionApi } from "../../api/createInstitutionApi";
+import { baseApi } from "../../api/baseApi";
 import type { University, UniversityFilters } from "./types";
 
-export const universitiesApi = createInstitutionApi<
-  University,
-  UniversityFilters
->("universities", "Universities");
+export const universitiesApi = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    getUniversities: builder.query<University[], UniversityFilters>({
+      query: (params) => ({
+        url: "/universities",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Universities"],
+    }),
 
-export const {
-  useGetEntitiesQuery: useGetUniversitiesQuery,
-  useDeleteEntityMutation: useDeleteUniversityMutation,
-} = universitiesApi;
+    deleteUniversity: builder.mutation<{ success: boolean }, string>({
+      query: (id) => ({
+        url: `/universities/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Universities"],
+    }),
+  }),
+  overrideExisting: false,
+});
+
+export const { useGetUniversitiesQuery, useDeleteUniversityMutation } =
+  universitiesApi;

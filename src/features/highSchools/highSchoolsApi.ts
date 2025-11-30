@@ -1,12 +1,27 @@
+import { baseApi } from "../../api/baseApi";
 import type { HighSchool, HighSchoolFilters } from "./types";
-import { createInstitutionApi } from "../../api/createInstitutionApi";
 
-export const highSchoolsApi = createInstitutionApi<
-  HighSchool,
-  HighSchoolFilters
->("high-schools", "HighSchools");
+export const highSchoolsApi = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    getHighSchools: builder.query<HighSchool[], HighSchoolFilters>({
+      query: (params) => ({
+        url: "/high-schools",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["HighSchools"],
+    }),
 
-export const {
-  useGetEntitiesQuery: useGetHighSchoolsQuery,
-  useDeleteEntityMutation: useDeleteHighSchoolMutation,
-} = highSchoolsApi;
+    deleteHighSchool: builder.mutation<{ success: boolean }, string>({
+      query: (id) => ({
+        url: `/high-schools/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["HighSchools"],
+    }),
+  }),
+  overrideExisting: false,
+});
+
+export const { useGetHighSchoolsQuery, useDeleteHighSchoolMutation } =
+  highSchoolsApi;

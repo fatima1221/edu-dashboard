@@ -1,31 +1,33 @@
-// src/api/createInstitutionApi.ts
-
 import { baseApi } from "./baseApi";
+import type { InstitutionEntity } from "./institutionMap";
+import { institutionMap } from "./institutionMap";
 
-export const createInstitutionApi = <
+export function createInstitutionApi<
   TEntity,
-  TFilters extends Record<string, any>
->(
-  entity: string,
-  tagType: "Universities" | "HighSchools" | "Schools"
-) =>
-  baseApi.injectEndpoints({
+  TFilters extends Record<string, any>,
+  TEntityName extends InstitutionEntity
+>(entity: TEntityName) {
+  const { tag, prefix } = institutionMap[entity];
+
+  return baseApi.injectEndpoints({
     endpoints: (builder) => ({
-      getEntities: builder.query<TEntity[], TFilters>({
+      [`get${prefix}`]: builder.query<TEntity[], TFilters>({
         query: (params) => ({
           url: `/${entity}`,
           method: "GET",
           params,
         }),
-        providesTags: [tagType],
+        providesTags: [tag],
       }),
 
-      deleteEntity: builder.mutation<{ success: boolean }, number>({
+      [`delete${prefix}`]: builder.mutation<{ success: boolean }, string>({
         query: (id) => ({
           url: `/${entity}/${id}`,
           method: "DELETE",
         }),
-        invalidatesTags: [tagType],
+        invalidatesTags: [tag],
       }),
     }),
+    overrideExisting: false,
   });
+}

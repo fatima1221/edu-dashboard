@@ -7,9 +7,9 @@ type AuthState = {
 };
 
 const initialState: AuthState = {
-  isAuthenticated: !!localStorage.getItem("token"),
-  token: localStorage.getItem("token") || undefined,
-  email: localStorage.getItem("email") || undefined,
+  isAuthenticated: false,
+  token: undefined,
+  email: undefined,
 };
 
 const authSlice = createSlice({
