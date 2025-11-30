@@ -7,6 +7,7 @@ import {
   TableRow,
   Paper,
   Typography,
+  Button,
 } from "@mui/material";
 import React from "react";
 
@@ -22,6 +23,7 @@ interface Props<T extends { id: string | number }> {
   rows: T[];
   columns: Column<T>[];
   emptyMessage?: string;
+  onDelete?: (row: T) => void;
 }
 
 function DataTable<T extends { id: string | number }>({
@@ -29,6 +31,7 @@ function DataTable<T extends { id: string | number }>({
   rows,
   columns,
   emptyMessage = "No data found",
+  onDelete,
 }: Props<T>) {
   return (
     <Paper sx={{ p: 2 }}>
@@ -50,6 +53,12 @@ function DataTable<T extends { id: string | number }>({
                   {col.header}
                 </TableCell>
               ))}
+
+              {onDelete && (
+                <TableCell align="right" sx={{ fontWeight: 600 }}>
+                  Actions
+                </TableCell>
+              )}
             </TableRow>
           </TableHead>
 
@@ -74,6 +83,18 @@ function DataTable<T extends { id: string | number }>({
                         : (row[col.key as keyof T] as any)}
                     </TableCell>
                   ))}
+                  {onDelete && (
+                    <TableCell align="right">
+                      <Button
+                        color="error"
+                        variant="outlined"
+                        size="small"
+                        onClick={() => onDelete(row)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             )}

@@ -1,10 +1,12 @@
+import React from "react";
 import { FilterPanel } from "../../../components/filter/FilterPanel";
 import type { FilterField } from "../../../components/filter/types";
 import DataTable from "../../../components/ui/DataTable";
 import type { Column } from "../../../components/ui/DataTable";
 import { useFilters } from "../../../components/filter/useFilters";
-import { useGetSchoolsQuery } from "../schoolsApi";
+import { useDeleteSchoolMutation, useGetSchoolsQuery } from "../schoolsApi";
 import type { School, SchoolFilters } from "../types";
+import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 
 const fields: FilterField[] = [
   { type: "text", name: "search", label: "Search" },
@@ -42,6 +44,22 @@ export default function SchoolsPage() {
   });
 
   const { data = [], isLoading } = useGetSchoolsQuery(filters);
+  const [deleteSchool] = useDeleteSchoolMutation();
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [selectedSchool, setSelectedSchool] = React.useState<School | null>(
+    null
+  );
+
+  const handleDeleteClick = (school: School) => {
+    setSelectedSchool(school);
+    setConfirmOpen(true);
+  };
+  const handleConfirmDelete = async () => {
+    if (!selectedSchool) return;
+    await deleteSchool(selectedSchool.id);
+    setConfirmOpen(false);
+    setSelectedSchool(null);
+  };
 
   return (
     <>
@@ -57,6 +75,14 @@ export default function SchoolsPage() {
         title="Schools"
         rows={isLoading ? [] : data}
         columns={columns}
+        onDelete={handleDeleteClick}
+      />
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete School"
+        message={`Are you sure you want to delete the school "${selectedSchool?.name}"?`}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmOpen(false)}
       />
     </>
   );

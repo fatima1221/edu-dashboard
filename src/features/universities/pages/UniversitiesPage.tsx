@@ -1,10 +1,15 @@
+import React from "react";
 import { FilterPanel } from "../../../components/filter/FilterPanel";
 import type { FilterField } from "../../../components/filter/types";
 import DataTable from "../../../components/ui/DataTable";
 import type { Column } from "../../../components/ui/DataTable";
 import { useFilters } from "../../../components/filter/useFilters";
-import { useGetUniversitiesQuery } from "../universitiesApi";
+import {
+  useGetUniversitiesQuery,
+  useDeleteUniversityMutation,
+} from "../universitiesApi";
 import type { University, UniversityFilters } from "../types";
+import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 
 const fields: FilterField[] = [
   { type: "text", name: "name", label: "University Name" },
@@ -34,6 +39,22 @@ export default function UniversitiesPage() {
   );
 
   const { data = [], isLoading } = useGetUniversitiesQuery(filters);
+  const [deleteUniversity] = useDeleteUniversityMutation();
+
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [selectedUniversity, setSelectedUniversity] =
+    React.useState<University | null>(null);
+
+  const handleDeleteClick = (university: University) => {
+    setSelectedUniversity(university);
+    setConfirmOpen(true);
+  };
+  const handleConfirmDelete = async () => {
+    if (!selectedUniversity) return;
+    await deleteUniversity(selectedUniversity.id);
+    setConfirmOpen(false);
+    setSelectedUniversity(null);
+  };
 
   return (
     <>
@@ -49,6 +70,14 @@ export default function UniversitiesPage() {
         title="Universities"
         rows={isLoading ? [] : data}
         columns={columns}
+        onDelete={handleDeleteClick}
+      />
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete University"
+        message={`Are you sure you want to delete the university "${selectedUniversity?.name}"?`}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmOpen(false)}
       />
     </>
   );
