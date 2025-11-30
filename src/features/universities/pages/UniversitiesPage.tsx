@@ -4,29 +4,24 @@ import type { FilterField } from "../../../components/filter/types";
 import DataTable from "../../../components/ui/DataTable";
 import type { Column } from "../../../components/ui/DataTable";
 import { useFilters } from "../../../components/filter/useFilters";
+
 import {
   useGetUniversitiesQuery,
   useDeleteUniversityMutation,
 } from "../universitiesApi";
 import type { University, UniversityFilters } from "../types";
+
 import ConfirmDialog from "../../../components/ui/ConfirmDialog";
+import ModalComponent from "../../../components/ui/ModalComponent";
+
+import Tooltip from "@mui/material/Tooltip";
+import IconButton from "@mui/material/IconButton";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const fields: FilterField[] = [
   { type: "text", name: "name", label: "University Name" },
   { type: "number", name: "yearFrom", label: "From Year" },
   { type: "number", name: "yearTo", label: "To Year" },
-];
-
-const columns: Column<University>[] = [
-  { key: "name", header: "Name" },
-  { key: "city", header: "City" },
-  { key: "district", header: "District" },
-  { key: "establishedYear", header: "Established" },
-  {
-    key: "corpora",
-    header: "Corpora",
-    render: (u) => u.corpora?.map((c) => c.name).join(", ") ?? "—",
-  },
 ];
 
 export default function UniversitiesPage() {
@@ -49,12 +44,44 @@ export default function UniversitiesPage() {
     setSelectedUniversity(university);
     setConfirmOpen(true);
   };
+
   const handleConfirmDelete = async () => {
     if (!selectedUniversity) return;
     await deleteUniversity(selectedUniversity.id);
     setConfirmOpen(false);
     setSelectedUniversity(null);
   };
+
+  const [corporaOpen, setCorporaOpen] = React.useState(false);
+  const [corporaUniversity, setCorporaUniversity] =
+    React.useState<University | null>(null);
+
+  const handleViewCorpora = (university: University) => {
+    setCorporaUniversity(university);
+    setCorporaOpen(true);
+  };
+
+  const columns: Column<University>[] = [
+    { key: "name", header: "Name" },
+    { key: "city", header: "City" },
+    { key: "district", header: "District" },
+    { key: "establishedYear", header: "Established" },
+
+    {
+      key: "corpora",
+      header: "Corpora",
+      render: (university) => (
+        <Tooltip title="View corpora">
+          <IconButton
+            size="small"
+            onClick={() => handleViewCorpora(university)}
+          >
+            <VisibilityIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -72,13 +99,26 @@ export default function UniversitiesPage() {
         columns={columns}
         onDelete={handleDeleteClick}
       />
+
       <ConfirmDialog
         open={confirmOpen}
         title="Delete University"
         message={`Are you sure you want to delete the university "${selectedUniversity?.name}"?`}
-        onConfirm={handleConfirmDelete}
         onCancel={() => setConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
       />
+
+      <ModalComponent
+        open={corporaOpen}
+        title={`${corporaUniversity?.name} – Corpora`}
+        onClose={() => setCorporaOpen(false)}
+      >
+        <ul style={{ paddingLeft: 20 }}>
+          {corporaUniversity?.corpora?.map((c) => (
+            <li key={c.id}>{c.name}</li>
+          ))}
+        </ul>
+      </ModalComponent>
     </>
   );
 }
