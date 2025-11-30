@@ -4,6 +4,9 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../app/store";
 import LoginForm from "../features/auth/components/LoginForm";
 import MainLayout from "../components/layout/MainLayout";
+import UniversitiesPage from "../features/universities/pages/UniversitiesPage";
+import HighSchoolsPage from "../features/highSchools/pages/HighSchoolsPage";
+import SchoolsPage from "../features/schools/pages/SchoolsPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuth = useSelector((state: RootState) => state.auth.isAuthenticated);
@@ -14,7 +17,8 @@ export const AppRouter: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginForm />} />{" "}
+        <Route path="/login" element={<LoginForm />} />
+
         <Route
           path="/"
           element={
@@ -23,10 +27,10 @@ export const AppRouter: React.FC = () => {
             </ProtectedRoute>
           }
         >
-          {/* <Route index element={<Navigate to="universities" replace />} /> */}
-          <Route path="universities" element={<div>Universities Page</div>} />
-          <Route path="high-schools" element={<div>High Schools Page</div>} />
-          <Route path="schools" element={<div>Schools Page</div>} />
+          <Route index element={<></>} />
+          <Route path="universities" element={<UniversitiesPage />} />
+          <Route path="high-schools" element={<HighSchoolsPage />} />
+          <Route path="schools" element={<SchoolsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
