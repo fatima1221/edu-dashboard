@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { FilterPanel } from "../../../components/filter/FilterPanel";
 import type { FilterField } from "../../../components/filter/types";
 import DataTable from "../../../components/ui/DataTable";
@@ -11,37 +11,43 @@ import {
 import type { HighSchool, HighSchoolFilters } from "../types";
 import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 
-const fields: FilterField[] = [
-  { type: "text", name: "search", label: "Search" },
-  { type: "text", name: "city", label: "City" },
-  { type: "text", name: "district", label: "District" },
-  {
-    type: "select",
-    name: "specialization",
-    label: "Specialization",
-    options: [
-      { value: "science", label: "Science" },
-      { value: "math", label: "Math" },
-      { value: "literature", label: "Literature" },
-      { value: "mixed", label: "Mixed" },
-    ],
-  },
-  { type: "checkbox", name: "hasDormitory", label: "Dormitory" },
-];
-
-const columns: Column<HighSchool>[] = [
-  { key: "name", header: "Name" },
-  { key: "city", header: "City" },
-  { key: "district", header: "District" },
-  { key: "specialization", header: "Specialization" },
-  {
-    key: "hasDormitory",
-    header: "Dormitory",
-    render: (hs) => (hs.hasDormitory ? "Yes" : "No"),
-  },
-];
-
 export default function HighSchoolsPage() {
+  const fields = useMemo<FilterField[]>(
+    () => [
+      { type: "text", name: "search", label: "Search" },
+      { type: "text", name: "city", label: "City" },
+      { type: "text", name: "district", label: "District" },
+      {
+        type: "select",
+        name: "specialization",
+        label: "Specialization",
+        options: [
+          { value: "science", label: "Science" },
+          { value: "math", label: "Math" },
+          { value: "literature", label: "Literature" },
+          { value: "mixed", label: "Mixed" },
+        ],
+      },
+      { type: "checkbox", name: "hasDormitory", label: "Dormitory" },
+    ],
+    []
+  );
+
+  const columns = useMemo<Column<HighSchool>[]>(
+    () => [
+      { key: "name", header: "Name" },
+      { key: "city", header: "City" },
+      { key: "district", header: "District" },
+      { key: "specialization", header: "Specialization" },
+      {
+        key: "hasDormitory",
+        header: "Dormitory",
+        render: (hs) => (hs.hasDormitory ? "Yes" : "No"),
+      },
+    ],
+    []
+  );
+
   const { filters, updateFilter, clearFilters } = useFilters<HighSchoolFilters>(
     {
       search: "",
@@ -84,6 +90,7 @@ export default function HighSchoolsPage() {
         rows={isLoading ? [] : data}
         columns={columns}
         onDelete={handleDeleteClick}
+        loading={isLoading}
       />
       <ConfirmDialog
         open={confirmOpen}

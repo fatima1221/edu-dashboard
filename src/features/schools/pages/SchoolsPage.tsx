@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { FilterPanel } from "../../../components/filter/FilterPanel";
 import type { FilterField } from "../../../components/filter/types";
 import DataTable from "../../../components/ui/DataTable";
@@ -8,33 +8,39 @@ import { useDeleteSchoolMutation, useGetSchoolsQuery } from "../schoolsApi";
 import type { School, SchoolFilters } from "../types";
 import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 
-const fields: FilterField[] = [
-  { type: "text", name: "search", label: "Search" },
-  { type: "text", name: "city", label: "City" },
-  { type: "text", name: "district", label: "District" },
-  {
-    type: "select",
-    name: "type",
-    label: "Type",
-    options: [
-      { value: "primary", label: "Primary" },
-      { value: "secondary", label: "Secondary" },
-      { value: "highschool", label: "Highschool" },
-    ],
-  },
-  { type: "number", name: "minStudents", label: "Min Students" },
-  { type: "number", name: "maxStudents", label: "Max Students" },
-];
-
-const columns: Column<School>[] = [
-  { key: "name", header: "Name" },
-  { key: "city", header: "City" },
-  { key: "district", header: "District" },
-  { key: "type", header: "Type" },
-  { key: "studentCount", header: "Students" },
-];
-
 export default function SchoolsPage() {
+  const fields = useMemo<FilterField[]>(
+    () => [
+      { type: "text", name: "search", label: "Search" },
+      { type: "text", name: "city", label: "City" },
+      { type: "text", name: "district", label: "District" },
+      {
+        type: "select",
+        name: "type",
+        label: "Type",
+        options: [
+          { value: "primary", label: "Primary" },
+          { value: "secondary", label: "Secondary" },
+          { value: "highschool", label: "Highschool" },
+        ],
+      },
+      { type: "number", name: "minStudents", label: "Min Students" },
+      { type: "number", name: "maxStudents", label: "Max Students" },
+    ],
+    []
+  );
+
+  const columns = useMemo<Column<School>[]>(
+    () => [
+      { key: "name", header: "Name" },
+      { key: "city", header: "City" },
+      { key: "district", header: "District" },
+      { key: "type", header: "Type" },
+      { key: "studentCount", header: "Students" },
+    ],
+    []
+  );
+
   const { filters, updateFilter, clearFilters } = useFilters<SchoolFilters>({
     search: "",
     city: "",
@@ -45,6 +51,7 @@ export default function SchoolsPage() {
 
   const { data = [], isLoading } = useGetSchoolsQuery(filters);
   const [deleteSchool] = useDeleteSchoolMutation();
+
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [selectedSchool, setSelectedSchool] = React.useState<School | null>(
     null
@@ -54,6 +61,7 @@ export default function SchoolsPage() {
     setSelectedSchool(school);
     setConfirmOpen(true);
   };
+
   const handleConfirmDelete = async () => {
     if (!selectedSchool) return;
     await deleteSchool(selectedSchool.id);
@@ -76,7 +84,9 @@ export default function SchoolsPage() {
         rows={isLoading ? [] : data}
         columns={columns}
         onDelete={handleDeleteClick}
+        loading={isLoading}
       />
+
       <ConfirmDialog
         open={confirmOpen}
         title="Delete School"

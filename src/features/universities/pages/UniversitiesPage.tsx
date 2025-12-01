@@ -1,4 +1,4 @@
-import React from "react";
+import { useMemo, useState, useCallback } from "react";
 import { FilterPanel } from "../../../components/filter/FilterPanel";
 import type { FilterField } from "../../../components/filter/types";
 import DataTable from "../../../components/ui/DataTable";
@@ -18,13 +18,50 @@ import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
-const fields: FilterField[] = [
-  { type: "text", name: "name", label: "University Name" },
-  { type: "number", name: "yearFrom", label: "From Year" },
-  { type: "number", name: "yearTo", label: "To Year" },
-];
-
 export default function UniversitiesPage() {
+  const [corporaOpen, setCorporaOpen] = useState(false);
+  const [corporaUniversity, setCorporaUniversity] = useState<University | null>(
+    null
+  );
+
+  const handleViewCorpora = useCallback((university: University) => {
+    setCorporaUniversity(university);
+    setCorporaOpen(true);
+  }, []);
+
+  const fields = useMemo<FilterField[]>(
+    () => [
+      { type: "text", name: "name", label: "University Name" },
+      { type: "number", name: "yearFrom", label: "From Year" },
+      { type: "number", name: "yearTo", label: "To Year" },
+    ],
+    []
+  );
+
+  const columns = useMemo<Column<University>[]>(
+    () => [
+      { key: "name", header: "Name" },
+      { key: "city", header: "City" },
+      { key: "district", header: "District" },
+      { key: "establishedYear", header: "Established" },
+      {
+        key: "corpora",
+        header: "Corpora",
+        render: (university) => (
+          <Tooltip title="View corpora">
+            <IconButton
+              size="small"
+              onClick={() => handleViewCorpora(university)}
+            >
+              <VisibilityIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        ),
+      },
+    ],
+    [handleViewCorpora]
+  );
+
   const { filters, updateFilter, clearFilters } = useFilters<UniversityFilters>(
     {
       name: "",
@@ -36,9 +73,9 @@ export default function UniversitiesPage() {
   const { data = [], isLoading } = useGetUniversitiesQuery(filters);
   const [deleteUniversity] = useDeleteUniversityMutation();
 
-  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedUniversity, setSelectedUniversity] =
-    React.useState<University | null>(null);
+    useState<University | null>(null);
 
   const handleDeleteClick = (university: University) => {
     setSelectedUniversity(university);
@@ -51,37 +88,6 @@ export default function UniversitiesPage() {
     setConfirmOpen(false);
     setSelectedUniversity(null);
   };
-
-  const [corporaOpen, setCorporaOpen] = React.useState(false);
-  const [corporaUniversity, setCorporaUniversity] =
-    React.useState<University | null>(null);
-
-  const handleViewCorpora = (university: University) => {
-    setCorporaUniversity(university);
-    setCorporaOpen(true);
-  };
-
-  const columns: Column<University>[] = [
-    { key: "name", header: "Name" },
-    { key: "city", header: "City" },
-    { key: "district", header: "District" },
-    { key: "establishedYear", header: "Established" },
-
-    {
-      key: "corpora",
-      header: "Corpora",
-      render: (university) => (
-        <Tooltip title="View corpora">
-          <IconButton
-            size="small"
-            onClick={() => handleViewCorpora(university)}
-          >
-            <VisibilityIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      ),
-    },
-  ];
 
   return (
     <>
@@ -98,6 +104,7 @@ export default function UniversitiesPage() {
         rows={isLoading ? [] : data}
         columns={columns}
         onDelete={handleDeleteClick}
+        loading={isLoading}
       />
 
       <ConfirmDialog

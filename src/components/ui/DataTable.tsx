@@ -10,7 +10,7 @@ import {
   Button,
 } from "@mui/material";
 import React from "react";
-
+import Loader from "./Loader";
 export interface Column<T> {
   key: keyof T | string;
   header: string;
@@ -24,6 +24,7 @@ interface Props<T extends { id: string | number }> {
   columns: Column<T>[];
   emptyMessage?: string;
   onDelete?: (row: T) => void;
+  loading?: boolean;
 }
 
 function DataTable<T extends { id: string | number }>({
@@ -32,7 +33,9 @@ function DataTable<T extends { id: string | number }>({
   columns,
   emptyMessage = "No data found",
   onDelete,
+  loading,
 }: Props<T>) {
+  const fullColSpan = columns.length + (onDelete ? 1 : 0);
   return (
     <Paper sx={{ p: 2 }}>
       {title && (
@@ -61,9 +64,15 @@ function DataTable<T extends { id: string | number }>({
               )}
             </TableRow>
           </TableHead>
-
+          {loading && (
+            <TableRow>
+              <TableCell colSpan={fullColSpan} align="center">
+                <Loader />
+              </TableCell>
+            </TableRow>
+          )}
           <TableBody>
-            {rows.length === 0 ? (
+            {!loading && rows.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
