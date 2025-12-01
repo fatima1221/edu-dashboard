@@ -1,74 +1,36 @@
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
 # edu-dashboard
+
+A small React + TypeScript + Vite admin UI for managing institutions (universities, high schools, schools).
+Uses Redux Toolkit, RTK Query, Vite, and MSW for development mocking.
+
+Quick start
+
+1. Install and run:
+   ```bash
+   npm install
+   npm run dev
+   ```
+2. Build and preview:
+   ```bash
+   npm run build
+   npm run preview
+   ```
+
+What’s inside (key files)
+
+- src/main.tsx — app entry, registers MSW in dev.
+- src/app/App.tsx — application root.
+- src/routes/AppRouter.tsx — routing.
+- src/app/store.ts — Redux store.
+- src/api/baseApi.ts — RTK Query base API.
+- src/api/createInstitutionApi.ts — helper to create institution APIs.
+- src/features/auth — login/logout and auth state (persisted).
+- src/features/\*/pages — pages for universities, high schools, schools.
+- src/components/ui — reusable UI (tables, modals, loader).
+- src/mocks/browser.ts and src/mocks/handler.ts — MSW mock setup.
+
+Notes
+
+- MSW (mocking) runs only in development (registered from src/main.tsx).
+- Auth state is persisted to localStorage.
+- Keep types in each feature folder for clarity.
