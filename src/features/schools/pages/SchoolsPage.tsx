@@ -7,6 +7,7 @@ import { useFilters } from "../../../components/filter/useFilters";
 import { useDeleteSchoolMutation, useGetSchoolsQuery } from "../schoolsApi";
 import type { School, SchoolFilters } from "../types";
 import ConfirmDialog from "../../../components/ui/ConfirmDialog";
+import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
 
 export default function SchoolsPage() {
   const fields = useMemo<FilterField[]>(
@@ -49,7 +50,9 @@ export default function SchoolsPage() {
     maxStudents: undefined,
   });
 
-  const { data = [], isLoading } = useGetSchoolsQuery(filters);
+  const debouncedFilters = useDebouncedValue(filters, 500);
+
+  const { data = [], isLoading } = useGetSchoolsQuery(debouncedFilters);
   const [deleteSchool] = useDeleteSchoolMutation();
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);

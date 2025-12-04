@@ -17,6 +17,7 @@ import ModalComponent from "../../../components/ui/ModalComponent";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
 
 export default function UniversitiesPage() {
   const [corporaOpen, setCorporaOpen] = useState(false);
@@ -70,7 +71,9 @@ export default function UniversitiesPage() {
     }
   );
 
-  const { data = [], isLoading } = useGetUniversitiesQuery(filters);
+  const debouncedFilters = useDebouncedValue(filters, 500);
+
+  const { data = [], isLoading } = useGetUniversitiesQuery(debouncedFilters);
   const [deleteUniversity] = useDeleteUniversityMutation();
 
   const [confirmOpen, setConfirmOpen] = useState(false);

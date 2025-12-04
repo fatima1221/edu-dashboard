@@ -36,6 +36,7 @@ function DataTable<T extends { id: string | number }>({
   loading,
 }: Props<T>) {
   const fullColSpan = columns.length + (onDelete ? 1 : 0);
+
   return (
     <Paper sx={{ p: 2 }}>
       {title && (

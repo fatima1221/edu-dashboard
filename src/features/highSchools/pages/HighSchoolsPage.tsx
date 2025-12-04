@@ -10,6 +10,7 @@ import {
 } from "../highSchoolsApi";
 import type { HighSchool, HighSchoolFilters } from "../types";
 import ConfirmDialog from "../../../components/ui/ConfirmDialog";
+import { useDebouncedValue } from "../../../hooks/useDebouncedValue";
 
 export default function HighSchoolsPage() {
   const fields = useMemo<FilterField[]>(
@@ -58,7 +59,9 @@ export default function HighSchoolsPage() {
     }
   );
 
-  const { data = [], isLoading } = useGetHighSchoolsQuery(filters);
+  const debouncedFilters = useDebouncedValue(filters, 500);
+
+  const { data = [], isLoading } = useGetHighSchoolsQuery(debouncedFilters);
   const [deleteHighSchool] = useDeleteHighSchoolMutation();
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
